@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "benchscore"
+version = "1.0.0"
+description = "轻量化大模型能力评测工具 — 支持多维度 Benchmark、GUI 操作、单机运行"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+authors = [{ name = "BenchScore Team" }]
+keywords = ["llm", "benchmark", "evaluation", "mmlu", "gsm8k", "humaneval"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "httpx>=0.27",
+    "openai>=1.50",
+    "anthropic>=0.40",
+    "datasets>=3.0",
+    "pyyaml>=6.0",
+    "matplotlib>=3.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+]
+
+[project.scripts]
+benchscore = "benchscore.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["benchscore*", "gui*"]
+
+[tool.setuptools.package-data]
+"benchscore.configs" = ["*.yaml"]

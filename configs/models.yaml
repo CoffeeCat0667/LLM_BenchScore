@@ -1,0 +1,57 @@
+# 预置模型列表
+# 添加新模型：在对应 provider 下新增一条
+
+providers:
+  openai:
+    - id: gpt-4o
+      name: GPT-4o
+      cost_per_1k_input: 0.0025
+      cost_per_1k_output: 0.01
+    - id: gpt-4o-mini
+      name: GPT-4o Mini
+      cost_per_1k_input: 0.00015
+      cost_per_1k_output: 0.0006
+    - id: gpt-4.1
+      name: GPT-4.1
+      cost_per_1k_input: 0.002
+      cost_per_1k_output: 0.008
+    - id: gpt-4.1-mini
+      name: GPT-4.1 Mini
+      cost_per_1k_input: 0.00040
+      cost_per_1k_output: 0.0016
+    - id: o4-mini
+      name: o4 Mini
+      cost_per_1k_input: 0.00110
+      cost_per_1k_output: 0.00440
+
+  anthropic:
+    - id: claude-sonnet-4-20250514
+      name: Claude Sonnet 4
+      cost_per_1k_input: 0.003
+      cost_per_1k_output: 0.015
+    - id: claude-opus-4-20250514
+      name: Claude Opus 4
+      cost_per_1k_input: 0.015
+      cost_per_1k_output: 0.075
+    - id: claude-haiku-4-5-20251001
+      name: Claude Haiku 4.5
+      cost_per_1k_input: 0.001
+      cost_per_1k_output: 0.005
+
+  openai_compatible:
+    - id: deepseek-v3
+      name: DeepSeek V3
+      cost_per_1k_input: 0.00027
+      cost_per_1k_output: 0.00110
+    - id: deepseek-r1
+      name: DeepSeek R1
+      cost_per_1k_input: 0.00055
+      cost_per_1k_output: 0.00219
+    - id: qwen3
+      name: Qwen3
+      cost_per_1k_input: 0.0
+      cost_per_1k_output: 0.0
+    - id: llama4
+      name: Llama 4
+      cost_per_1k_input: 0.0
+      cost_per_1k_output: 0.0

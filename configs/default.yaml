@@ -1,0 +1,35 @@
+# BenchScore 默认配置
+# 此文件会被环境变量覆盖，见 benchscore/config.py
+
+hf_endpoint: "https://hf-mirror.com"
+hf_token: ""
+
+concurrency: 10
+temperature: 0.0
+max_retries: 3
+request_timeout: 120
+
+results_dir: "results"
+
+# Benchmark 默认参数
+benchmark_defaults:
+  mmlu:
+    sample_size: 1000
+    few_shot: 5
+    weight: 1.0
+  gsm8k:
+    sample_size: 500
+    few_shot: 5
+    weight: 1.0
+  humaneval:
+    sample_size: null        # 全量 164 题
+    few_shot: 0
+    weight: 1.0
+
+# 维度权重（总和为 1）
+dimension_weights:
+  knowledge: 0.20
+  reasoning: 0.20
+  code: 0.20
+  language: 0.20
+  safety: 0.20
