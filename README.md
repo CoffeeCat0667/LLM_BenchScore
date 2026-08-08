@@ -1,121 +1,307 @@
 # BenchScore — 轻量化大模型能力评测工具
 
-[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-brightgreen.svg)](https://github.com/CoffeeCat0667/LLM_BenchScore/releases)
 
-单机运行、tkinter 轻量 GUI、零外部数据库依赖的大模型评测框架。
+单机运行、tkinter 轻量 GUI、零外部数据库依赖的一站式大模型评测工具。**一键安装，即刻评测**。
 
-## 功能
+---
 
-- **多维度评测**: 知识 (MMLU)、推理 (GSM8K)、代码 (HumanEval)
-- **多模型对比**: 支持 OpenAI GPT 系列、Anthropic Claude 系列、兼容 OpenAI 协议模型 (DeepSeek/Qwen/vLLM)
-- **轻量 GUI**: tkinter 桌面界面，实时进度、得分图表、历史记录
-- **CLI 模式**: 命令行一键跑评测，CI/CD 友好
-- **灵活采样**: 全量/采样模式，滑块调节样本数
-- **费用预估**: 评测前预估 API 费用，全量模式弹窗确认
-- **HuggingFace 镜像**: 内置 hf-mirror.com 支持，国内可用
+## 功能概览
 
-## 快速开始
+### 三大 Benchmark 评测
 
-### 安装
+| Benchmark | 维度 | 题量 | 评测方式 |
+|-----------|------|------|----------|
+| **MMLU** | 知识 | 14,042 题 (57学科) | 5-shot 多选题 |
+| **GSM8K** | 推理 | 1,319 题 | 5-shot 链式推理 (CoT) |
+| **HumanEval** | 代码 | 164 题 | 0-shot Python 代码生成 + 沙箱执行 |
+
+### 六项站点诊断
+
+| 测试项 | 说明 |
+|--------|------|
+| **站点响应延迟** | 3 次 API 调用取平均 RTT |
+| **协议一致性** | HTTP 状态码 + Content-Type 校验 |
+| **响应结构** | JSON 字段完整性验证 |
+| **型号特征校验** | 模型自报身份与配置比对 |
+| **首字响应时间 (TTFT)** | 流式请求测量首个 token 延迟 |
+| **隐藏提示词检测** | 3 种注入探针检测 System Prompt 泄露 |
+
+### 核心特性
+
+- **双模式运行**：GUI 桌面界面 + CLI 命令行
+- **多协议支持**：OpenAI / Anthropic / 兼容 OpenAI 协议（DeepSeek、Qwen、vLLM 等）
+- **灵活采样**：全量 / 自定义采样数量
+- **实时反馈**：并发进度条 + 预估耗时 + 费用预告
+- **JSON 结果存储**：轻量、可复制、可二次分析
+- **HuggingFace 镜像**：内置 hf-mirror.com 支持，国内网络友好
+- **数据集预加载**：启动时检查缓存，一键下载
+
+---
+
+## 评测截图
+
+以下是 **deepseek-v4-flash-0731** 的评测结果：
+
+![DeepSeek v4 Flash 评测结果](results.png)
+
+---
+
+## 环境要求
+
+| 组件 | 最低版本 |
+|------|----------|
+| Python | **3.12+** |
+| 操作系统 | Windows / macOS / Linux |
+| 网络 | 需访问 LLM API 端点 + HuggingFace 镜像 |
+
+## 安装
+
+### 1. 克隆仓库
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/CoffeeCat0667/LLM_BenchScore.git
 cd LLM_BenchScore
+```
+
+### 2. 创建虚拟环境（推荐）
+
+**Windows (PowerShell):**
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+**macOS / Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. 安装依赖
+
+```bash
 pip install -e .
 ```
 
-### 启动 GUI
+这会自动安装所有必需依赖：
+
+| 包 | 用途 |
+|----|------|
+| `openai` | OpenAI / 兼容协议的 API 调用 |
+| `anthropic` | Anthropic Claude API 调用 |
+| `datasets` | HuggingFace 数据集加载 |
+| `httpx` | HTTP 客户端 |
+| `pyyaml` | 配置文件解析 |
+| `matplotlib` | 结果图表渲染 |
+
+> **注意**：`tkinter` 是 Python 内置模块，无需单独安装。
+
+### 4. 验证安装
+
+```bash
+python -c "from benchscore import __version__; print(__version__)"
+# 输出: 1.0.0
+```
+
+---
+
+## 快速开始
+
+### GUI 模式（推荐）
 
 ```bash
 python -m gui.app
 ```
 
-### CLI 评测
+首次启动会弹出**数据集准备窗口**，建议点击"下载未缓存的"提前下载数据集：
+
+- MMLU (~1.2GB)
+- GSM8K (~8MB)
+- HumanEval (~1MB)
+
+下载一次后永久缓存，后续启动秒开。
+
+> 国内用户默认使用 `hf-mirror.com` 镜像，无需额外配置。
+
+### CLI 模式
 
 ```bash
 # 查看可用 Benchmark
 benchscore list
 
-# 运行 MMLU 评测 (采样 1000 题)
+# 运行 MMLU 评测（采样 1000 题）
 benchscore run gpt-4o -b mmlu -k sk-your-api-key
 
 # 运行多个 Benchmark
-benchscore run gpt-4o -b mmlu,gsm8k -k sk-xxx -n 500
+benchscore run gpt-4o -b mmlu,gsm8k,humaneval -k sk-xxx
 
-# 查看历史记录
-benchscore history
+# 指定并发数和采样量
+benchscore run deepseek-chat -b mmlu -n 500 -c 20 \
+  -k sk-xxx --base-url https://api.deepseek.com/v1
 ```
 
-### 配置 API Key
+---
+
+## 配置指南
+
+### 填入 API Key
 
 三种方式（优先级从高到低）：
 
-1. **GUI 中直接输入**（会话级，不落盘）
-2. **环境变量**: `export BENCHSCORE_OPENAI_API_KEY=sk-xxx`
-3. **配置文件**: 将 API Key 填入 `configs/default.yaml`
+1. **GUI 直接输入**（会话级，不落盘）
+2. **环境变量**：
+   ```bash
+   # Windows PowerShell
+   $env:BENCHSCORE_OPENAI_API_KEY="sk-your-key"
+
+   # macOS / Linux
+   export BENCHSCORE_OPENAI_API_KEY="sk-your-key"
+   ```
+3. **配置文件** `configs/default.yaml`
+
+### 自定义 API 端点
+
+在 GUI 的 **Base URL** 栏填写（**必须包含 `/v1` 后缀**）：
+
+| 服务商 | Base URL |
+|--------|----------|
+| OpenAI 官方 | 留空 |
+| DeepSeek | `https://api.deepseek.com/v1` |
+| 本地 vLLM | `http://localhost:8000/v1` |
+| 本地 Ollama | `http://localhost:11434/v1` |
+
+### 模型 ID 示例
+
+| 模型 | Model ID |
+|------|----------|
+| GPT-4o | `gpt-4o` |
+| GPT-4o Mini | `gpt-4o-mini` |
+| Claude Sonnet 4 | `claude-sonnet-4-20250514` |
+| Claude Opus 4 | `claude-opus-4-20250514` |
+| DeepSeek V3 | `deepseek-chat` |
+| DeepSeek R1 | `deepseek-reasoner` |
+
+### HuggingFace 镜像
+
+默认使用 `hf-mirror.com`，国内免代理。如需切换：
+
+```bash
+export HF_ENDPOINT="https://huggingface.co"   # 官方源
+```
+
+---
+
+## 完整测试流程
+
+以 DeepSeek 为例：
+
+1. **启动 GUI**
+   ```bash
+   python -m gui.app
+   ```
+
+2. **配置模型**（在"评测"标签页左侧面板）
+
+   | 字段 | 填写 |
+   |------|------|
+   | API 格式 | `openai` |
+   | API Key | 你的 DeepSeek API Key |
+   | Base URL | `https://api.deepseek.com/v1` |
+   | Model ID | `deepseek-chat` |
+
+3. **选择 Benchmark** — 勾选 MMLU / GSM8K / HumanEval，调整采样数
+
+4. **点击 ▶ 开始评测**
+
+5. **站点诊断** — 切换到"站点测试"标签页，点击 🔍 开始测试，验证 API 端点健康状态
+
+---
 
 ## 项目结构
 
 ```
 LLM_BenchScore/
-├── benchscore/              # 核心 Python 包
-│   ├── adapters/            # LLM 接口适配 (OpenAI/Anthropic/兼容)
-│   ├── benchmarks/          # Benchmark 实现 (MMLU/GSM8K/HumanEval)
-│   ├── dataset_adapters/    # HuggingFace 数据格式转换
-│   ├── metrics/             # 评分函数 (精确匹配/数学/代码执行)
-│   ├── report/              # 报告输出 (终端)
-│   ├── site_tester.py       # 站点测试引擎 (6项诊断)
-│   ├── config.py            # 配置管理
-│   ├── runner.py            # 异步评测引擎
-│   ├── scorer.py            # 评分聚合
-│   ├── store.py             # JSON 结果存储
-│   └── cli.py               # CLI 入口
-├── gui/                     # tkinter GUI
-│   ├── app.py               # 主窗口
-│   ├── splash.py            # 数据集预加载窗口
-│   ├── model_panel.py       # 模型配置面板
-│   ├── benchmark_panel.py   # Benchmark 选择面板
-│   ├── run_panel.py         # 运行控制+进度+日志
-│   ├── result_panel.py      # 结果展示+图表
-│   ├── site_test_panel.py   # 站点测试面板
-│   └── dialogs.py           # 弹窗
-├── configs/                 # 配置文件
-│   ├── default.yaml         # 默认配置
-│   └── models.yaml          # 预置模型列表
-├── results/                 # JSON 结果存储
-└── tests/                   # 测试
+├── benchscore/                    # 核心 Python 包
+│   ├── adapters/                  # LLM API 适配器
+│   │   ├── base.py                #   抽象基类 + 批量并发 + 重试逻辑
+│   │   ├── openai.py              #   OpenAI / 兼容协议
+│   │   ├── anthropic.py           #   Anthropic Claude
+│   │   └── openai_compatible.py   #   第三方兼容端点
+│   ├── benchmarks/                # 多维度评测
+│   │   ├── base.py                #   统一流水线抽象
+│   │   ├── mmlu.py                #   57 学科知识评测
+│   │   ├── gsm8k.py               #   数学推理评测
+│   │   └── humaneval.py           #   代码生成评测
+│   ├── dataset_adapters/          # HuggingFace 数据格式转换
+│   ├── metrics/                   # 评分算法
+│   │   ├── exact_match.py         #   精确匹配 + 多选题答案提取
+│   │   ├── math_grader.py         #   数学答案提取 + 数值比对
+│   │   └── code_executor.py       #   subprocess 沙箱代码执行
+│   ├── site_tester.py             # 站点诊断引擎（6 项测试）
+│   ├── runner.py                  # 异步并发评测调度
+│   ├── scorer.py                  # 多维度加权评分
+│   ├── store.py                   # JSON 文件结果存储
+│   └── cli.py                     # CLI 命令行入口
+├── gui/                           # tkinter 桌面界面
+│   ├── app.py                     #   主窗口（多标签页）
+│   ├── splash.py                  #   启动前数据集预加载
+│   ├── model_panel.py             #   模型配置面板
+│   ├── benchmark_panel.py         #   Benchmark 选择面板
+│   ├── run_panel.py               #   运行控制 + 实时进度 + 日志
+│   ├── result_panel.py            #   结果展示 + 图表
+│   ├── site_test_panel.py         #   站点测试面板
+│   └── dialogs.py                 #   弹窗（费用确认等）
+├── configs/                       # 默认配置文件
+├── results/                       # JSON 结果输出目录
+└── pyproject.toml                 # 项目元数据
 ```
+
+---
 
 ## 扩展新 Benchmark
 
 1. 创建 `benchscore/benchmarks/your_bench.py`，继承 `BaseBenchmark`
 2. 创建对应的 `benchscore/dataset_adapters/your_adapter.py`
-3. 在 `benchscore/benchmarks/__init__.py` 注册
-4. 在 `configs/default.yaml` 添加默认参数
+3. 在 `benchscore/benchmarks/__init__.py` 中注册
 
 ```python
+from benchscore.benchmarks.base import BaseBenchmark
+
 class YourBenchmark(BaseBenchmark):
     name = "your_bench"
     dimension = "knowledge"
     dataset_id = "your/dataset_id"
+    sample_size = 500
 
     def build_prompt(self, sample) -> str:
-        return sample.prompt
+        return f"Question: {sample.prompt}\nAnswer:"
 
     def score(self, sample, response: str) -> dict:
         correct = (response.strip() == sample.expected_answer)
-        return {"correct": correct, "id": sample.id, ...}
+        return {"correct": correct, "id": sample.id, "group": "default"}
 ```
 
-## 依赖
+---
 
-```
-httpx, openai, anthropic, datasets, pyyaml, matplotlib
-```
+## 常见问题
 
-tkinter 是 Python 内置模块，无需额外安装。
+**Q: 首次评测卡在"加载数据集"？**  
+A: 首次需从 HuggingFace 下载数据集（MMLU ~1.2GB），请耐心等待。后续运行从缓存加载，秒级完成。
+
+**Q: 全部 API 调用失败？**  
+A: 检查 Base URL 是否遗漏 `/v1` 后缀；或使用"站点测试"标签页运行诊断定位问题。
+
+**Q: 进度条得分始终显示 `—`？**  
+A: 正常现象——评分在全部 API 调用完成后统一计算，进度回调期间无法实时得知正确率。
+
+**Q: tkinter 报错 `No module named '_tkinter'`？**  
+A: 部分 Linux 发行版需单独安装：`sudo apt install python3-tk` (Ubuntu) 或 `sudo yum install python3-tkinter` (CentOS)。
+
+---
 
 ## License
 
-MIT
+本项目采用 [Apache License 2.0](LICENSE)。
