@@ -1,10 +1,10 @@
 [build-system]
 requires = ["setuptools>=75", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "benchscore"
-version = "1.0.0"
+version = "0.1.1"
 description = "轻量化大模型能力评测工具 — 支持多维度 Benchmark、GUI 操作、单机运行"
 readme = "README.md"
 license = { text = "MIT" }

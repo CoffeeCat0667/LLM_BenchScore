@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/Release-v1.0.0-brightgreen.svg)](https://github.com/CoffeeCat0667/LLM_BenchScore/releases)
+[![Release](https://img.shields.io/badge/Release-v0.1.1-brightgreen.svg)](https://github.com/CoffeeCat0667/LLM_BenchScore/releases)
 
 单机运行、tkinter 轻量 GUI、零外部数据库依赖的一站式大模型评测工具。**一键安装，即刻评测**。
 
@@ -66,21 +66,47 @@ git clone https://github.com/CoffeeCat0667/LLM_BenchScore.git
 cd LLM_BenchScore
 ```
 
-### 2. 创建虚拟环境（推荐）
+### 2. 新建 Python 虚拟环境（推荐）
+
+虚拟环境将项目依赖与系统全局 Python 环境隔离，避免包版本互相污染。
 
 **Windows (PowerShell):**
 ```powershell
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+```
+
+**Windows (CMD):**
+```cmd
+python -m venv venv
 ```
 
 **macOS / Linux:**
 ```bash
 python3 -m venv venv
+```
+
+> `venv` 为环境目录名，可按需自定义（如 `.venv`）。
+
+### 3. 进入虚拟环境
+
+**Windows (PowerShell):**
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+**Windows (CMD):**
+```cmd
+venv\Scripts\activate.bat
+```
+
+**macOS / Linux:**
+```bash
 source venv/bin/activate
 ```
 
-### 3. 安装依赖
+进入成功后，命令行提示符前会出现 `(venv)` 前缀，此时 `python` 与 `pip` 均指向虚拟环境。
+
+### 4. 安装依赖
 
 ```bash
 pip install -e .
@@ -99,12 +125,39 @@ pip install -e .
 
 > **注意**：`tkinter` 是 Python 内置模块，无需单独安装。
 
-### 4. 验证安装
+### 5. 验证安装
 
 ```bash
 python -c "from benchscore import __version__; print(__version__)"
-# 输出: 1.0.0
+# 输出: 0.1.1
 ```
+
+### 6. 退出虚拟环境
+
+```bash
+deactivate
+```
+
+### 7. 删除虚拟环境
+
+退出虚拟环境后，直接删除环境目录即可：
+
+**Windows (PowerShell):**
+```powershell
+Remove-Item -Recurse -Force venv
+```
+
+**Windows (CMD):**
+```cmd
+rmdir /s /q venv
+```
+
+**macOS / Linux:**
+```bash
+rm -rf venv
+```
+
+> 删除后如需重新使用，重复第 2 步重新新建即可。
 
 ---
 
